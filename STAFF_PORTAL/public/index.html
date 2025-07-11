@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>School Portal - Login</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+</head>
+<body class="login-page">
+  <div class="login-container">
+    <div class="logo">
+      <img src="" alt="School Logo" class="logo-img">
+      <h1>Teaching Staff Portal</h1>
+    </div>
+
+    <!-- Auth Type Tabs -->
+    <div class="auth-tabs">
+      <button class="auth-tab-btn active" id="login-tab" onclick="switchAuthType('login')">
+        <i class="fas fa-sign-in-alt"></i> Login
+      </button>
+      <button class="auth-tab-btn" id="signup-tab" onclick="switchAuthType('signup')">
+        <i class="fas fa-user-plus"></i> Sign Up
+      </button>
+    </div>
+
+    <!-- User Type Tabs -->
+    <div class="user-type-tabs">
+      <button class="user-type-btn active" id="staff-tab" onclick="switchUserType('staff')">
+        <i class="fas fa-chalkboard-teacher"></i> Staff
+      </button>
+      <button class="user-type-btn" id="admin-tab" onclick="switchUserType('admin')">
+        <i class="fas fa-user-shield"></i> Admin
+      </button>
+    </div>
+
+    <!-- Error Message -->
+    <div id="form-error" class="form-error" style="display: none;"></div>
+
+    <!-- Login Forms -->
+    <form id="staff-login" class="auth-form active-form">
+      <div class="form-group">
+        <label for="staff-login-email">Email</label>
+        <input type="email" name="email" id="staff-login-email" placeholder="staff@school.edu" required />
+      </div>
+      <div class="form-group">
+        <label for="staff-login-password">Password</label>
+        <input type="password" name="password" id="staff-login-password" placeholder="••••••••" required />
+      </div>
+      <button type="submit" class="btn btn-login">
+        <i class="fas fa-sign-in-alt"></i> Login
+      </button>
+    </form>
+
+    <form id="admin-login" class="auth-form">
+      <div class="form-group">
+        <label for="admin-login-email">Email</label>
+        <input type="email" name="email" id="admin-login-email" placeholder="admin@school.edu" required />
+      </div>
+      <div class="form-group">
+        <label for="admin-login-password">Password</label>
+        <input type="password" name="password" id="admin-login-password" placeholder="••••••••" required />
+      </div>
+      <button type="submit" class="btn btn-login">
+        <i class="fas fa-sign-in-alt"></i> Login
+      </button>
+    </form>
+
+    <!-- Signup Forms -->
+    <form id="staff-signup" class="auth-form">
+      <div class="form-group">
+        <label for="staff-signup-name">Full Name</label>
+        <input type="text" name="name" id="staff-signup-name" placeholder="John Doe" required />
+      </div>
+      <div class="form-group">
+        <label for="staff-signup-email">Email</label>
+        <input type="email" name="email" id="staff-signup-email" placeholder="staff@school.edu" required />
+      </div>
+      <div class="form-group">
+        <label for="staff-signup-password">Password</label>
+        <input type="password" name="password" id="staff-signup-password" placeholder="••••••••" required />
+      </div>
+      <div class="form-group">
+        <label for="staff-signup-confirm">Confirm Password</label>
+        <input type="password" id="staff-signup-confirm" placeholder="••••••••" required />
+      </div>
+      <button type="submit" class="btn btn-signup">
+        <i class="fas fa-user-plus"></i> Sign Up
+      </button>
+    </form>
+
+    <form id="admin-signup" class="auth-form">
+      <div class="form-group">
+        <label for="admin-signup-name">Full Name</label>
+        <input type="text" name="name" id="admin-signup-name" placeholder="Admin User" required />
+      </div>
+      <div class="form-group">
+        <label for="admin-signup-email">Email</label>
+        <input type="email" name="email" id="admin-signup-email" placeholder="admin@school.edu" required />
+      </div>
+      <div class="form-group">
+        <label for="admin-signup-password">Password</label>
+        <input type="password" name="password" id="admin-signup-password" placeholder="••••••••" required />
+      </div>
+      <div class="form-group">
+        <label for="admin-signup-confirm">Confirm Password</label>
+        <input type="password" id="admin-signup-confirm" placeholder="••••••••" required />
+      </div>
+      <div class="form-group">
+        <label for="admin-signup-code">Admin Code</label>
+        <input type="password" name="adminCode" id="admin-signup-code" placeholder="Secret admin code" required />
+      </div>
+      <button type="submit" class="btn btn-signup">
+        <i class="fas fa-user-plus"></i> Sign Up
+      </button>
+    </form>
+  </div>
+
+  <script>
+    function switchAuthType(type) {
+      document.querySelectorAll(".auth-tab-btn").forEach(btn => btn.classList.remove("active"));
+      document.getElementById(type + "-tab").classList.add("active");
+
+      const userType = document.querySelector(".user-type-btn.active").id.replace("-tab", "");
+      document.querySelectorAll(".auth-form").forEach(form => form.classList.remove("active-form"));
+      document.getElementById(`${userType}-${type}`).classList.add("active-form");
+
+      clearError();
+    }
+
+    function switchUserType(type) {
+      document.querySelectorAll(".user-type-btn").forEach(btn => btn.classList.remove("active"));
+      document.getElementById(type + "-tab").classList.add("active");
+
+      const authType = document.querySelector(".auth-tab-btn.active").id.replace("-tab", "");
+      document.querySelectorAll(".auth-form").forEach(form => form.classList.remove("active-form"));
+      document.getElementById(`${type}-${authType}`).classList.add("active-form");
+
+      clearError();
+    }
+
+    function showError(message) {
+      const errorDiv = document.getElementById("form-error");
+      errorDiv.textContent = message;
+      errorDiv.style.display = "block";
+    }
+
+    function clearError() {
+      const errorDiv = document.getElementById("form-error");
+      errorDiv.textContent = "";
+      errorDiv.style.display = "none";
+    }
+
+    function handleFormSubmit(formId, endpoint, isSignup = false) {
+      const form = document.getElementById(formId);
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        clearError();
+
+        const formData = new FormData(form);
+        const data = {};
+        formData.forEach((value, key) => data[key] = value);
+
+        if (isSignup) {
+          const confirmId = formId.includes("staff") ? "staff-signup-confirm" : "admin-signup-confirm";
+          const password = form.querySelector('input[name="password"]').value;
+          const confirm = document.getElementById(confirmId).value;
+
+          if (!password || password !== confirm) {
+            showError("Passwords do not match.");
+            return;
+          }
+        }
+
+        try {
+          const response = await fetch(endpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+          });
+
+          const result = await response.json();
+          if (!response.ok) {
+            showError(result.message || "Something went wrong.");
+          } else {
+            alert(result.message || "Success!");
+            form.reset();
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          showError("An error occurred. Please try again.");
+        }
+      });
+    }
+
+    window.onload = () => {
+      switchAuthType('login');
+      switchUserType('staff');
+
+      handleFormSubmit("staff-login", "/api/staff/login");
+      handleFormSubmit("admin-login", "/api/admin/login");
+      handleFormSubmit("staff-signup", "/api/staff/signup", true);
+      handleFormSubmit("admin-signup", "/api/admin/signup", true);
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,371 @@
+**********PROJECT PRODUCTION PROCESS**********\*
+
+## 📁 Folder Structure
+
+```
+STAFF_PORTAL/
+├── public/                 # Frontend files (HTML, CSS, JS)
+├── src/
+│   ├── routes/            # Route handlers
+│   │   ├── authRoutes.js
+│   │   ├── userRoutes.js
+│   │   └── tlmRoutes.js   # Routes for TLM uploads and management
+│   ├── middleware/        # Custom middleware (e.g. auth.js)
+│   ├── db.js              # SQLite database setup
+│   └── server.js          # Main server file
+├── uploads/               # Uploaded TLM files
+├── .env                   # Environment variables
+├── test.rest              # REST client test scripts
+├── package.json           # Project config
+```
+
+---
+
+## 📦 Initialize Project & Install Dependencies
+
+```bash
+npm init -y
+npm install express bcryptjs jsonwebtoken sqlite3 dotenv multer
+```
+
+---
+
+## 🚀 Set Up Server (`server.js`)
+
+```js
+import express from "express";
+import path, { dirname } from "path";
+import { fileURLToPath } from "url";
+import dotenv from "dotenv";
+import authRoutes from "./routes/authRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
+import tlmRoutes from "./routes/tlmRoutes.js";
+import fs from "fs";
+
+dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.use(express.json());
+app.use("/api", authRoutes);
+app.use("/users", userRoutes);
+app.use("/tlms", tlmRoutes);
+app.use("/uploads", express.static("uploads"));
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
+```
+
+---
+
+## 🗄️ Set Up SQLite Database (`db.js`)
+
+```js
+import sqlite3 from "sqlite3";
+import { open } from "sqlite";
+import { dirname } from "path";
+import { fileURLToPath } from "url";
+import path from "path";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const db = await open({
+  filename: path.join(__dirname, "database.sqlite"),
+  driver: sqlite3.Database,
+});
+
+await db.exec(`
+  CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    password TEXT NOT NULL,
+    role TEXT CHECK(role IN ('staff', 'admin')) NOT NULL
+  );
+`);
+
+await db.exec(`
+  CREATE TABLE IF NOT EXISTS tlms (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    filename TEXT NOT NULL,
+    originalname TEXT NOT NULL,
+    uploader_id INTEGER,
+    uploaded_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (uploader_id) REFERENCES users(id)
+  );
+`);
+
+export default db;
+```
+
+---
+
+## 🔐 Authentication Routes (`authRoutes.js`)
+
+```js
+import express from "express";
+bcrypt from "bcryptjs";
+jwt from "jsonwebtoken";
+import db from "../db.js";
+
+const router = express.Router();
+
+const createToken = (id, role) =>
+  jwt.sign({ id, role }, process.env.JWT_SECRET, { expiresIn: "24h" });
+
+router.post("/staff/signup", (req, res) => {
+  const { username, password, email } = req.body;
+  const hashedPassword = bcrypt.hashSync(password, 8);
+  try {
+    const stmt = db.prepare(
+      `INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, 'staff')`
+    );
+    const result = stmt.run(username, email, hashedPassword);
+    const token = createToken(result.lastInsertRowid, "staff");
+    res.json({ token });
+  } catch (err) {
+    res.status(500).json({ message: "Signup failed" });
+  }
+});
+
+router.post("/staff/login", (req, res) => {
+  const { email, password } = req.body;
+  const user = db.prepare("SELECT * FROM users WHERE email = ?").get(email);
+  if (!user || !bcrypt.compareSync(password, user.password))
+    return res.status(401).json({ message: "Invalid credentials" });
+  const token = createToken(user.id, user.role);
+  res.json({ token });
+});
+
+router.post("/admin/signup", (req, res) => {
+  const { username, password, email } = req.body;
+  const hashedPassword = bcrypt.hashSync(password, 8);
+  try {
+    const stmt = db.prepare(
+      `INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, 'admin')`
+    );
+    const result = stmt.run(username, email, hashedPassword);
+    const token = createToken(result.lastInsertRowid, "admin");
+    res.json({ token });
+  } catch (err) {
+    res.status(500).json({ message: "Signup failed" });
+  }
+});
+
+router.post("/admin/login", (req, res) => {
+  const { email, password } = req.body;
+  const user = db.prepare("SELECT * FROM users WHERE email = ?").get(email);
+  if (!user || user.role !== "admin" || !bcrypt.compareSync(password, user.password))
+    return res.status(403).json({ message: "Unauthorized" });
+  const token = createToken(user.id, user.role);
+  res.json({ token });
+});
+
+export default router;
+```
+
+---
+
+## 🛡️ Auth Middleware (`auth.js`)
+
+```js
+import jwt from "jsonwebtoken";
+
+const authMiddleware = (req, res, next) => {
+  const token = req.headers["authorization"]?.split(" ")[1];
+  if (!token) return res.status(401).json({ message: "No token provided" });
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (err) {
+    res.status(400).json({ message: "Invalid token" });
+  }
+};
+
+export default authMiddleware;
+```
+
+---
+
+## 👥 User Routes (`userRoutes.js`)
+
+```js
+import express from "express";
+import db from "../db.js";
+import auth from "../middleware/auth.js";
+
+const router = express.Router();
+
+router.get("/", auth, (req, res) => {
+  const users = db.prepare("SELECT id, username, email, role FROM users").all();
+  res.json(users);
+});
+
+router.put("/:id", auth, (req, res) => {
+  const { username, email } = req.body;
+  const stmt = db.prepare(`UPDATE users SET username = ?, email = ? WHERE id = ?`);
+  stmt.run(username, email, req.params.id);
+  res.json({ message: "User updated" });
+});
+
+router.delete("/:id", auth, (req, res) => {
+  const stmt = db.prepare(`DELETE FROM users WHERE id = ?`);
+  stmt.run(req.params.id);
+  res.json({ message: "User deleted" });
+});
+
+export default router;
+```
+
+---
+
+## 📂 TLM Uploads and Viewing (`tlmRoutes.js`)
+
+```js
+import express from "express";
+import multer from "multer";
+import db from "../db.js";
+import auth from "../middleware/auth.js";
+
+const router = express.Router();
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, "uploads/"),
+  filename: (req, file, cb) => cb(null, `${Date.now()}-${file.originalname}`),
+});
+
+const upload = multer({ storage });
+
+router.post("/upload", auth, upload.single("file"), (req, res) => {
+  const { filename, originalname } = req.file;
+  const stmt = db.prepare(
+    `INSERT INTO tlms (filename, originalname, uploader_id) VALUES (?, ?, ?)`
+  );
+  stmt.run(filename, originalname, req.user.id);
+  res.json({ message: "File uploaded successfully" });
+});
+
+router.get("/view", auth, (req, res) => {
+  const isAdmin = req.user.role === "admin";
+  const stmt = isAdmin
+    ? db.prepare("SELECT * FROM tlms")
+    : db.prepare("SELECT * FROM tlms WHERE uploader_id = ?");
+  const files = isAdmin ? stmt.all() : stmt.all(req.user.id);
+  res.json(files);
+});
+
+export default router;
+```
+
+---
+
+## 🔮 Testing (`test.rest`)
+
+```http
+### Staff Signup
+POST http://localhost:3000/api/staff/signup
+Content-Type: application/json
+
+{
+  "username": "staff01",
+  "email": "staff01@example.com",
+  "password": "123456"
+}
+
+### Staff Login
+POST http://localhost:3000/api/staff/login
+Content-Type: application/json
+
+{
+  "email": "staff01@example.com",
+  "password": "123456"
+}
+
+### Admin Login
+POST http://localhost:3000/api/admin/login
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "password": "adminpass"
+}
+```
+
+---
+
+With all features—authentication, user management, TLM uploads, admin views—this complete and structured guide allows you to rebuild the full-stack app step-by-step and grow your backend skills with confidence.
+
+---
+
+## Authentication Routes Details
+
+- Handles staff and admin signup and login.
+- Passwords are hashed using bcrypt before storing.
+- JWT tokens are created for authenticated sessions with expiration.
+- Checks for existing users during signup to prevent duplicates.
+- Returns appropriate HTTP status codes and messages on success or failure.
+
+## User Routes Details
+
+- Uses multer for file uploads with configuration for storage location and file naming.
+- Staff profile routes:
+  - GET `/staff/profile`: Retrieves authenticated staff profile.
+  - PUT `/staff/profile`: Updates staff profile with optional fields and password hashing.
+  - DELETE `/staff/profile`: Deletes authenticated staff profile.
+- Leave application routes:
+  - POST `/staff/leave`: Staff submits leave application with required fields.
+  - GET `/staff/leaveResponce`: Staff views leave application responses.
+- Teaching and Learning Materials (TLM) submission:
+  - POST `/staff/submitTLM`: Staff submits TLM files with title and description.
+- Admin routes:
+  - DELETE `/admin/delete/`: Admin deletes staff profile by email.
+  - GET `/admin/staffProfiles`: Admin retrieves all staff profiles.
+  - GET `/admin/leaveApplications`: Admin views all leave applications.
+  - PUT `/admin/LeaveApplication/approve`: Admin approves leave application.
+  - PUT `/admin/LeaveApplication/reject`: Admin rejects leave application.
+  - GET `/admin/viewTLMs`: Admin views all submitted TLMs.
+- All routes use authentication middleware to protect access.
+- Proper error handling and status codes are implemented.
+
+## Database Initialization (db.js)
+
+- Handles ES module path compatibility for database file location.
+- Initializes SQLite database connection.
+- Creates tables if they do not exist:
+  - `staff`: Stores staff user information including role and contact details.
+  - `leave_applications`: Stores leave requests linked to staff with status and admin comments.
+  - `tlm`: Stores teaching and learning materials metadata linked to staff.
+- Uses foreign keys to maintain relational integrity.
+
+## Server Setup (server.js)
+
+- Sets up Express application.
+- Mounts routes for authentication and user management.
+- Serves static files from the public directory.
+- Defines root route to serve index.html.
+- Listens on port 3000 and logs server start.
+
+## Authentication Middleware
+
+- Checks for authorization header and extracts JWT token.
+- Verifies token using secret key.
+- Attaches decoded user info to request object.
+- Returns 401 if token missing, 400 if invalid.
+
+"bcryptjs": "^3.0.2",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.0.1",
+    "sqlite": "^5.1.1",
+    "sqlite3": "^5.1.7"

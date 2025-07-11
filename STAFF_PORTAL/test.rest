@@ -1,0 +1,184 @@
+#### GET / endpoint
+GET http://localhost:3000
+
+#### sign up a user
+POST http://localhost:3000/api/staff/signup
+Content-Type: application/json
+
+
+{
+     "email": "newcomer@gmail.com",
+    "name": "new commer",
+    "password": "123456"
+
+
+
+}
+
+### admin sign up a staff
+POST  http://localhost:3000/users/admin/addStaff
+Content-Type: application/json
+Authorization: Bearer 
+
+
+{
+    "email": "newcomer@gmail.com",
+    "name": "new commer",
+    "password": "123456",
+    "role": "staff"
+
+
+}
+
+
+
+
+#### login a user
+POST http://localhost:3000/api/staff/login
+Content-Type: application/json
+
+{
+    "email": "newcomer@gmail.com",
+    "password": "123456"
+
+
+}
+
+### get user profile
+GET http://localhost:3000/users/staff/profile
+Authorization: Bearer 
+### update user profile
+PUT  http://localhost:3000/users/staff/profile
+Authorization: Bearer 
+Content-Type: application/json 
+
+{
+  "name": "new comer",
+  "email": "newcomer@gmail.com",
+   "password": "123456",
+   "role" :"staff",
+    "classTaught":"class 6",
+    "subject": "maths",
+    "contact":"0255555555",
+    "address": "123 raspberry steet"
+
+}
+
+
+
+### delete user profile
+DELETE http://localhost:3000/users/staff/profile
+Authorization: Bearer 
+
+
+
+### staff submit leave
+POST http://localhost:3000/users/staff/leave
+Content-Type: application/json
+Authorization: Bearer 
+{"reason": "study room leave",
+  "start_date": "2025-06-11",
+  "end_date": "2025-06-1"
+  
+} 
+
+
+
+### staff view leave application responce
+GET http://localhost:3000/users/staff/leaveResponce
+Authorization: Bearer 
+### staff submits TLMs
+POST http://localhost:3000/users/staff/submitTLMs
+Authorization: Bearer 
+Content-Type: multipart/form-data; boundary=MyBoundary
+
+--MyBoundary
+Content-Disposition: form-data; name="title"
+
+Introduction to sample subject
+
+--MyBoundary
+Content-Disposition: form-data; name="description"
+
+Week 1 lesson note covering basics of sample subject
+--MyBoundary
+Content-Disposition: form-data; name="file"; filename="sample.pdf"
+Content-Type: application/pdf
+
+ ../sample.pdf
+--MyBoundary--
+
+
+
+
+### admin signup
+POST http://localhost:3000/api/admin/signup
+Content-Type: application/json
+
+{
+ "name" : "victor pinto",
+ "email" : "vkpinto@gmial.com",
+ "password" : "iamalive",
+ "role" : "admin"
+}
+
+
+### admin login
+POST http://localhost:3000/api/admin/login
+Content-Type: application/json
+
+{
+  "email": "vkpinto@gmial.com",
+  "password": "iamalive"
+}
+
+
+
+### admin get all staff profiles
+GET http://localhost:3000/users/admin/staffProfiles
+Authorization: Bearer 
+
+### admin get all staff leaveApplications
+GET http://localhost:3000/users/admin/leaveApplications
+Authorization: Bearer 
+### admin approve leave application
+PUT http://localhost:3000/users/admin/LeaveApplication/approve
+Authorization: Bearer 
+Content-Type: application/json
+
+{
+ "email": "EmmaAgbovie@gmail.com"
+}
+
+### admin reject leave application
+PUT http://localhost:3000/users/admin/LeaveApplication/reject
+Authorization: Bearer 
+Content-Type: application/json
+
+{
+ "email": "EmmaAgbovie@gmail.com"
+}
+
+### admin views all staff submitted TLMs
+GET http://localhost:3000/users/admin/viewTLMs
+Authorization : Bearer 
+
+
+
+
+
+
+
+
+
+
+
+
+### admin deletes user profile
+DELETE http://localhost:3000/users/admin/delete
+Content-Type: application/json
+Authorization: Bearer 
+
+{
+  "email": "example@gmail.com"
+}
