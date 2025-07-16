@@ -6,6 +6,7 @@ import path from "path";
 import { verifyToken, isStaff, isAdmin } from "../middleware/authmiddleware.js";
 import sqlite3 from "sqlite3";
 import { open } from "sqlite";
+import { sendWelcomeEmail } from "../services/emailService.js";
 
 export async function initDb() {
   const db = await open({
@@ -142,23 +143,57 @@ router.post(
 // ==============================
 
 // amin create staff account.
+function generateRandomPassword(length = 10) {
+  const charset = "1234567890";
+  let password = "KH";
+  for (let i = 0; i < length - 2; i++) {
+    password += charset.charAt(Math.floor(Math.random() * charset.length));
+  }
+  return password;
+}
+
 router.post("/admin/addStaff", verifyToken, isAdmin, async (req, res) => {
-  const { name, email, password, role } = req.body;
+  const { name, email, role } = req.body;
+  let { password } = req.body;
 
   try {
     const existing = await db.get(`SELECT * FROM staff WHERE email = ?`, [
       email,
     ]);
     if (existing) return res.status(400).json({ message: "User exists" });
+
+    if (!password) {
+      password = generateRandomPassword();
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
     const result = await db.run(
       `INSERT INTO staff (name, email, password, role) VALUES (?, ?, ?, ?)`,
       [name, email, hashedPassword, role]
     );
+
+    const sendingEmail = await sendWelcomeEmail(email, name, password);
+    if (sendingEmail.success) {
+      res.status(201).json({
+        message: "staff created successfully and onboarding email sent",
+      });
+    } else {
+      res.status(201).json({
+        message:
+          "staff created successfuly but there was a problem sending onboarding email",
+        credentials: { email, password },
+      });
+    }
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "coould not register staff" });
   }
+});
+
+// get admin profile.
+router.get("/admin/profile", verifyToken, isAdmin, async (req, res) => {
+  const Admin = await db.get(`SELECT * FROM staff WHERE id = ?`, [req.user.id]);
+  res.json(Admin);
 });
 
 // View all staff profiles
@@ -176,7 +211,7 @@ router.get(
   isAdmin,
   async (req, res) => {
     const applications = await db.all(`
-    SELECT la.*, s.name, s.email FROM leaveApplications la
+    SELECT leaveApplications.*, staff.name, staff.email FROM leaveApplications la
     JOIN staff s ON la.staffId = s.id
   `);
     res.json(applications);

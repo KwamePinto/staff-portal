@@ -60,11 +60,7 @@ router.post("/admin/signup", async (req, res) => {
       `INSERT INTO staff (name, email, password, role) VALUES (?, ?, ?, ?)`,
       [name, email, hashed, "admin"]
     );
-    const token = jwt.sign(
-      { id: result.lastID, role: "admin" },
-      process.env.JWT_SECRET
-    );
-    res.status(201).json({ token });
+    res.status(201).json({ message: "Admin registered successfully" });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Internal Server Error" });
@@ -74,14 +70,17 @@ router.post("/admin/signup", async (req, res) => {
 router.post("/admin/login", async (req, res) => {
   const { email, password } = req.body;
   try {
-    const u = await db.get(
+    const user = await db.get(
       `SELECT * FROM staff WHERE email = ? AND role = 'admin'`,
       [email]
     );
-    if (!u || !(await bcrypt.compare(password, u.password)))
+    if (!user || !(await bcrypt.compare(password, user.password)))
       return res.status(401).json({ message: "Invalid credentials" });
-    const token = jwt.sign({ id: u.id, role: u.role }, process.env.JWT_SECRET);
-    res.json({ token });
+    const token = jwt.sign(
+      { id: user.id, role: user.role },
+      process.env.JWT_SECRET
+    );
+    res.json({ token, user });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Internal Server Error" });
