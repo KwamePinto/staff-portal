@@ -1,0 +1,173 @@
+This is the backend of a staff Portal using  expressJS , bcryptJS , JWT authentication Multer file handeling, nodemailer email and an SQLite database(temporal)
+To run this backend server in your local environment, make sure to first initialize and install npm, then run "npm run dev"
+        npm init -y
+        npm install
+
+This backend has the following functionalities and can be accessed through the following API endpoints
+*********************************************************************************************************
+sign up a user into the system and add to database through;
+http://localhost:3000/api/staff/signup
+
+this is an example of the accepted payload 
+{
+    "email": "newcomer@gmail.com",
+    "name": "new commer",
+    "password": "123456",
+    "role": "staffrole"
+}
+
+admin can sign up a staff and add to database through;
+POST  http://localhost:3000/users/admin/addStaff
+
+this is an example of the accepted payload 
+{
+    "email": "newcomer@gmail.com",
+    "name": "new commer",
+    "role": "non teaching staff"
+}
+note that passwords are automatically assigned to a newly onboarded staff,
+in testing use valid email in order to get real results
+
+login a user into the system through;
+POST http://localhost:3000/api/staff/login
+
+this is an example of the accepted payload 
+{
+    "email": "newcomer@gmail.com",
+    "password": "123456"
+}
+
+get user profile and information from the system through;
+http://localhost:3000/users/staff/profile
+
+no payload required
+
+update user profile to input new or extra information into the system through;
+http://localhost:3000/users/staff/profile
+{
+  "name": "new comer",
+  "email": "newcomer@gmail.com",
+   "password": "12345",
+   "role" :"updated role",
+    "classTaught":"new information",
+    "subject": "new information",
+    "contact":"new information",
+    "address": "new information"
+}
+
+delete user profile from the system through
+http://localhost:3000/users/staff/profile
+
+staff submit leave for review by the admin throug; 
+http://localhost:3000/users/staff/leave
+
+this is an example of the accepted payload 
+{"reason": "study room leave",
+  "start_date": "2025-06-11",
+  "end_date": "2025-06-1"
+  } 
+
+staff view  leave application responce (accepted or denied)
+http://localhost:3000/users/staff/leaveResponce
+
+staff submits Teaching and learning materials
+http://localhost:3000/users/staff/submitTLMs
+
+this is an example of the accepted payload 
+
+--MyBoundary
+Content-Disposition: form-data; name="title"
+
+Introduction to sample subject
+
+--MyBoundary
+Content-Disposition: form-data; name="description"
+
+Week 1 lesson note covering basics of sample subject
+--MyBoundary
+Content-Disposition: form-data; name="file"; filename="sample.pdf"
+Content-Type: application/pdf
+
+ ../sample.pdf
+--MyBoundary--
+
+
+
+
+admin can be signed up to the system through;
+http://localhost:3000/api/admin/signup
+
+this is an example of the accepted payload 
+{
+ "name" : "victor pinto",
+ "email" : "vkpinto@gmial.com",
+ "password" : "iamalive",
+ "role" : "admin"
+}
+
+
+admin can login into the system through ;
+http://localhost:3000/api/admin/login
+
+this is an example of the accepted payload 
+{
+  "email": "vkpinto@gmial.com",
+  "password": "iamalive"
+}
+
+ admins can get all staff profiles through
+GET http://localhost:3000/users/admin/staffProfiles
+
+admin can get all staff submitted leaveApplications through
+http://localhost:3000/users/admin/leaveApplications
+
+admin can approve leave applications through
+http://localhost:3000/users/admin/LeaveApplication/approve
+
+this is an example of the accepted payload 
+{
+ "email": "EmmaAgbovie@gmail.com"
+}
+
+admin can reject leave application through;
+PUT http://localhost:3000/users/admin/LeaveApplication/reject
+
+this is an example of the accepted payload 
+
+{
+ "email": "EmmaAgbovie@gmail.com"
+}
+
+ admin can views all staff submitted TLMs through;
+GET http://localhost:3000/users/admin/viewTLMs
+
+
+
+
+
+
+
+
+
+
+
+ admin can delete user accounts through
+DELETE http://localhost:3000/users/admin/delete
+
+this is an example of the accepted payload 
+
+{
+  "email": "example@gmail.com"
+}
+
+      *************************************************************************************************************************************************
+NOTE:| all endpoint URLs will be changed from localhost 3000 when the backend server is hosted.                                                         |
+     | all the endpoints can be tested for correct functionality in the test.rest file. all responses to the various APIs can also be viewd there.      |
+      *************************************************************************************************************************************************
+
+Thank you 🤖😎👍
+
+
+
+
+
