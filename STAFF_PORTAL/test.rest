@@ -18,11 +18,11 @@ Content-Type: application/json
 ### admin sign up a staff
 POST  http://localhost:3000/users/admin/addStaff
 Content-Type: application/json
-Authorization: Bearer 
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzUyNzY5MzAyfQ.LL10hzshTKnREbuncC0P3XGV1jQr5VkIsZRcFLHNTdE
 
 {
-    "email": "vkpinto1234@gmail.com",
-    "name": "victor Pinto",
+    "email": "elipiokanyiri88@gmail.com",
+    "name": "Elikan",
     "role": "staff"
 
 
@@ -119,6 +119,9 @@ Content-Type: application/json
  "password" : "iamalive",
  "role" : "admin"
 }
+
+### get user profile
+GET http://localhost:3000/users/user/profile
 
 
 ### admin login

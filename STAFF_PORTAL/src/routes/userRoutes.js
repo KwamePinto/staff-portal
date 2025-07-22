@@ -190,6 +190,12 @@ router.post("/admin/addStaff", verifyToken, isAdmin, async (req, res) => {
   }
 });
 
+// get user profile
+router.get("/user/profile", verifyToken, async (req, res) => {
+  const user = await db.get(`SELECT * FROM staff WHERE id = ?`, [req.user.id]);
+  res.json(user);
+});
+
 // get admin profile.
 router.get("/admin/profile", verifyToken, isAdmin, async (req, res) => {
   const Admin = await db.get(`SELECT * FROM staff WHERE id = ?`, [req.user.id]);
@@ -211,7 +217,7 @@ router.get(
   isAdmin,
   async (req, res) => {
     const applications = await db.all(`
-    SELECT leaveApplications.*, staff.name, staff.email FROM leaveApplications la
+    SELECT la.*, s.name, s.email FROM leaveApplications la
     JOIN staff s ON la.staffId = s.id
   `);
     res.json(applications);
