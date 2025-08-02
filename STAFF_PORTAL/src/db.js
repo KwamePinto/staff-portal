@@ -43,3 +43,22 @@ await db.exec(`
   );`);
 
 export default db;
+
+await db.exec(`
+  CREATE TABLE IF NOT EXISTS announcements (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  announcement_title TEXT,
+  announcement TEXT,
+  announcement_date DEFAULT CURRENT_TIMESTAMP
+  )
+  
+  `);
+
+await db.exec(`
+  CREATE TABLE IF NOT EXISTS suggestions (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  suggestion_box TEXT,
+  suggestion_time TEXT DEFAULT CURRENT_TIMESTAMP
+  )
+  
+  `);

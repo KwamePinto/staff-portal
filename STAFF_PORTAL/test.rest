@@ -3,11 +3,11 @@ GET http://localhost:3000
 
 #### sign up a user
 POST http://localhost:3000/api/staff/signup
-Content-Type: application/json
+Content-Type: application/json 
 
 
 {
-     "email": "newcomer@gmail.com",
+     "email": "vkpinto1234@gmail.com",
     "name": "new commer",
     "password": "123456"
 
@@ -18,11 +18,11 @@ Content-Type: application/json
 ### admin sign up a staff
 POST  http://localhost:3000/users/admin/addStaff
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzUyNzY5MzAyfQ.LL10hzshTKnREbuncC0P3XGV1jQr5VkIsZRcFLHNTdE
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzU0MTY0NDQ5fQ.tNYfmsv4GkMWxG-H_d8yz0z1F9L023bjJb7h5isb2y8
 
 {
-    "email": "elipiokanyiri88@gmail.com",
-    "name": "Elikan",
+    "email": "vkpinto1234@gmail.com",
+    "name": "pinto",
     "role": "staff"
 
 
@@ -36,8 +36,8 @@ POST http://localhost:3000/api/staff/login
 Content-Type: application/json
 
 {
-    "email": "newcomer@gmail.com",
-    "password": "123456"
+    "email": "vkpinto1234@gmail.com",
+    "password": "KH93115847"
 
 
 }
@@ -80,7 +80,19 @@ Authorization: Bearer
   
 } 
 
+### staff view announcements
+GET http://localhost:3000/users/staff/announcements
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6InN0YWZmIiwiaWF0IjoxNzU0MTYzMzY2fQ.C1eFJSjm_yJ0hxCcJb1TJd-LV4Pe80CLaq-BZFYq42w
 
+### staff submit suggestions
+POST http://localhost:3000/users/staff/suggestions
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6InN0YWZmIiwiaWF0IjoxNzU0MTYzMzY2fQ.C1eFJSjm_yJ0hxCcJb1TJd-LV4Pe80CLaq-BZFYq42w
+Content-Type: application/json
+
+{
+  "suggestion": "improve the school infrastructure"
+  
+}
 
 ### staff view leave application responce
 GET http://localhost:3000/users/staff/leaveResponce
@@ -122,6 +134,7 @@ Content-Type: application/json
 
 ### get user profile
 GET http://localhost:3000/users/user/profile
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Mywicm9sZSI6InN0YWZmIiwiaWF0IjoxNzUzMTg5NjMzfQ.c0bErFmUErWuJfFhQFmcSNWL_KuNZtMPn_ck2NuY19c
 
 
 ### admin login
@@ -168,8 +181,20 @@ Content-Type: application/json
 GET http://localhost:3000/users/admin/viewTLMs
 Authorization : Bearer 
 
+### admin broadcasts announcements
+POST http://localhost:3000/users/admin/announcement
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzU0MTY0NDQ5fQ.tNYfmsv4GkMWxG-H_d8yz0z1F9L023bjJb7h5isb2y8
+Content-Type: application/json
 
+{
+  "announcmentTitle": "Test Announcement",
+  "announcement": "This is a test announcement"
 
+}
+
+### admin view suggestions
+GET http://localhost:3000/users/admin/viewSuggestions
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzU0MTY0NDQ5fQ.tNYfmsv4GkMWxG-H_d8yz0z1F9L023bjJb7h5isb2y8
 
 
 

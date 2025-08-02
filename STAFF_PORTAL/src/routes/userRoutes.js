@@ -7,6 +7,7 @@ import { verifyToken, isStaff, isAdmin } from "../middleware/authmiddleware.js";
 import sqlite3 from "sqlite3";
 import { open } from "sqlite";
 import { sendWelcomeEmail } from "../services/emailService.js";
+import { log } from "console";
 
 export async function initDb() {
   const db = await open({
@@ -105,6 +106,51 @@ router.get("/staff/leaveResponce", verifyToken, isStaff, async (req, res) => {
   res.json(applications);
 });
 
+// submit suggestion/complaint
+router.post("/staff/suggestions", verifyToken, isStaff, async (req, res) => {
+  const { suggestion } = req.body;
+
+  try {
+    const communique = await db.run(
+      `INSERT INTO suggestions (suggestion_box) VALUES (?)`,
+      [suggestion]
+    );
+    if (communique) {
+      res.status(201).json({ message: "suggestion successfully sent" });
+    } else {
+      res.status(500).json({ message: "suggestion submission failed" });
+    }
+  } catch (error) {
+    console.log(error);
+    res
+      .status(500)
+      .json({ message: "there was a problem submiitting your suggeston" });
+  }
+});
+
+// view announcements
+router.get("/staff/announcements", verifyToken, isStaff, async (req, res) => {
+  try {
+    let recentAnnouncements = await db.all(
+      `SELECT announcement_title, announcement, announcement_date FROM announcements WHERE announcement_date >= datetime('now', '-7 days')`
+    );
+    const oldAnnouncements = await db.all(
+      `SELECT announcement_title, announcement, announcement_date FROM announcements WHERE announcement_date < datetime('now', '-7 days') `
+    );
+    if (!recentAnnouncements) {
+      recentAnnouncements = "No announcements this week";
+    }
+    if (recentAnnouncements && oldAnnouncements) {
+    }
+    res.status(200).json({ recentAnnouncements, oldAnnouncements });
+  } catch (error) {
+    console.log(error);
+    res
+      .status(500)
+      .json({ message: "there was a problem fetching announcements" });
+  }
+});
+
 // Submit TLM
 router.post(
   "/staff/submitTLMs",
@@ -186,7 +232,27 @@ router.post("/admin/addStaff", verifyToken, isAdmin, async (req, res) => {
     }
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: "coould not register staff" });
+    res.status(500).json({ message: "could not register staff" });
+  }
+});
+
+//Communicate announcements
+router.post("/admin/announcement", verifyToken, async (req, res) => {
+  const { announcementTitle, announcement } = req.body;
+
+  try {
+    const communique = await db.run(
+      `INSERT INTO announcements (announcement_title, announcement) VALUES (?,?)`,
+      [announcementTitle, announcement]
+    );
+    if (communique) {
+      res.status(201).json({ message: "Announcement given successfully" });
+    } else {
+      res.status(500).json({ message: "Annouccement broadcast failed " });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "could not broadcast announcement" });
   }
 });
 
@@ -289,6 +355,24 @@ router.get("/admin/viewTLMs", verifyToken, isAdmin, async (req, res) => {
   } catch (error) {
     console.error("Failed to fetch TLMs", error);
     res.status(500).json({ message: "Failed to retrieve teaching materials" });
+  }
+});
+
+// view all suggestions
+router.get("/admin/viewSuggestions", verifyToken, isAdmin, async (req, res) => {
+  try {
+    const suggestionboxItems = await db.get(
+      `SELECT suggestion_box, suggestion_time From suggestions`
+    );
+    if (!suggestionboxItems) {
+      res
+        .status(400)
+        .json({ message: "there are no suggestions at this time" });
+    }
+    res.status(200).json(suggestionboxItems);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Failed to retrieve suggestions" });
   }
 });
 
