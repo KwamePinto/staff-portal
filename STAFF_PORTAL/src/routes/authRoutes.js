@@ -29,7 +29,7 @@ router.post("/staff/login", async (req, res) => {
   const { email, password } = req.body;
   try {
     const user = await db.get(
-      `SELECT id,name, email, password, role FROM staff WHERE email = ?`,
+      `SELECT id, name, email, password, role FROM staff WHERE role = "staff" AND email = ?`,
       [email]
     );
     if (!user || !(await bcrypt.compare(password, user.password)))

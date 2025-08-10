@@ -276,6 +276,21 @@ router.get("/admin/staffProfiles", verifyToken, isAdmin, async (req, res) => {
   res.json(profiles);
 });
 
+// view staff profiles by id
+router.get(
+  "/admin/staffProfiles/:id",
+  verifyToken,
+  isAdmin,
+  async (req, res) => {
+    const staffid = req.params.id;
+    const profile = await db.all(
+      `SELECT id, name, email, role, classTaught, subject, contact, address FROM staff WHERE role = "staff" AND id = ?`,
+      [staffid]
+    );
+    res.json(profile);
+  }
+);
+
 // View all leave applications
 router.get(
   "/admin/leaveApplications",
@@ -400,6 +415,31 @@ router.get("/admin/viewSuggestions", verifyToken, isAdmin, async (req, res) => {
     res.status(500).json({ message: "Failed to retrieve suggestions" });
   }
 });
+
+// view all suggestions by id
+router.get(
+  "/admin/viewSuggestions/:id",
+  verifyToken,
+  isAdmin,
+  async (req, res) => {
+    const suggestionID = req.params.id;
+    try {
+      const suggestionboxItems = await db.get(
+        `SELECT suggestion_box, suggestion_time From suggestions where id = ?`,
+        [suggestionID]
+      );
+      if (!suggestionboxItems) {
+        res.status(400).json({
+          message: `there are no suggestions with id ${suggestionID}`,
+        });
+      }
+      res.status(200).json(suggestionboxItems);
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: "Failed to retrieve suggestion" });
+    }
+  }
+);
 
 // Delete a staff account
 router.delete("/admin/delete", verifyToken, isAdmin, async (req, res) => {

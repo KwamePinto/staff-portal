@@ -7,8 +7,8 @@ Content-Type: application/json
 
 
 {
-     "email": "vkpinto1234@gmail.com",
-    "name": "new commer",
+     "email": "Testuser@gmail.com",
+    "name": "Testuser",
     "password": "123456"
 
 
@@ -18,7 +18,7 @@ Content-Type: application/json
 ### admin sign up a staff
 POST  http://localhost:3000/users/admin/addStaff
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzU0NTc3NjQyfQ.iY-FFCFUd5IPMytBCHOgcVNSwALoYSQqz-q6tGZX0Aw
+Authorization: Bearer 
 
 {
     "email": "emmanuelofotsukwablaagbovie@gmail.com",
@@ -73,7 +73,7 @@ Authorization: Bearer
 ### staff submit leave
 POST http://localhost:3000/users/staff/leave
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6InN0YWZmIiwiaWF0IjoxNzU0NTgzMzY3fQ.kopRgPYzA0jSZz27DJ30ch5hUrCQQ_A0-s8j0T7ri_w
+Authorization: Bearer 
 
 {"reason": "study room leave",
   "start_date": "2025-06-11",
@@ -158,11 +158,11 @@ Authorization: Bearer
 
 ### admin get all staff leaveApplications
 GET http://localhost:3000/users/admin/leaveApplications
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzU0NTgzNDE5fQ.ZvJjC6369Uf6IETinQmH85k_IQh5khsX_9TMu58sPA0
+Authorization: Bearer 
 
 ### admin get staff leaveApplications by ID
-GET http://localhost:3000/users/admin/leaveApplications/1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzU0NTgzNDE5fQ.ZvJjC6369Uf6IETinQmH85k_IQh5khsX_9TMu58sPA0
+GET http://localhost:3000/users/admin/leaveApplications/2
+Authorization: Bearer 
 
 
 
