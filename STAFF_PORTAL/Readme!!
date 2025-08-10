@@ -65,13 +65,14 @@ http://localhost:3000/users/staff/announcements
 
 no payload required
 
+
 staff submit suggestions through;
 POST http://localhost:3000/users/staff/suggestions
 
 this is an example of the accepted payload
 {
-"suggestion": "improve the school infrastructure"
-
+  "suggestion": "improve the school infrastructure"
+  
 }
 
 staff submit leave for review by the admin throug;
@@ -134,6 +135,10 @@ GET http://localhost:3000/users/admin/staffProfiles
 admin can get all staff submitted leaveApplications through
 http://localhost:3000/users/admin/leaveApplications
 
+admins can get staff leaveApplications by ID through
+http://localhost:3000/users/admin/leaveApplications/ID
+NB>> replace ID with actual id in question eg http://localhost:3000/users/admin/leaveApplications/1
+
 admin can approve leave applications through
 http://localhost:3000/users/admin/LeaveApplication/approve
 
@@ -181,7 +186,6 @@ this is an example of the accepted payload
 
 NOTE:| all endpoint URLs will be changed from localhost 3000 when the backend server is hosted. |
 | all the endpoints can be tested for correct functionality in the test.rest file. all responses to the various APIs can also be viewd there. |
-
----
+*************************************************************************************************************************************************
 
 Thank you 🤖😎👍

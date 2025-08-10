@@ -290,6 +290,31 @@ router.get(
   }
 );
 
+// view leave application by leave id
+router.get(
+  "/admin/leaveApplications/:id",
+  verifyToken,
+  isAdmin,
+  async (req, res) => {
+    const leaveID = req.params.id;
+
+    try {
+      const leave = await db.get(
+        `SELECT la.*, s.name, s.email FROM leaveApplications la JOIN staff s ON la.staffId = s.id WHERE la.id = ?`,
+        [leaveID]
+      );
+      if (!leave)
+        return res.status(404).json({ message: "Leave application not found" });
+      res.json(leave);
+    } catch (error) {
+      console.log(error);
+      res
+        .status(500)
+        .json({ message: "there was a problem getting leave apllication" });
+    }
+  }
+);
+
 // Approve leave application
 router.put(
   "/admin/LeaveApplication/approve",

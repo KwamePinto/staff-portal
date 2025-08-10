@@ -22,8 +22,12 @@ export async function sendWelcomeEmail(staffEmail, staffName, tempPassword) {
       </style>
     </head>
     <body>
-      <h1>Welcome to Kid's Haven International School, ${staffName}</h1>
+      <h1>Welcome to Kid's Haven Montissori, ${staffName}</h1>
       <div class="credentials">
+      <p>You have successfully been onboarded onto our staff portal. </br>
+      Kindly sign in to the portal with your Email and password as given below. </br>
+      You will be given the opportunity to change your password once you log in.</br>
+      Best regards!</P>
         <p>Email: ${staffEmail}</p>
         <p>Password: ${tempPassword}</p>
       </div>
