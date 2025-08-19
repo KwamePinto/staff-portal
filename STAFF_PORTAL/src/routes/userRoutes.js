@@ -90,11 +90,11 @@ router.delete("/staff/profile", verifyToken, isStaff, async (req, res) => {
 // Submit leave application
 router.post("/staff/leave", verifyToken, isStaff, async (req, res) => {
   const { reason, start_date, end_date } = req.body;
-  await db.run(
+  const leave = await db.run(
     `INSERT INTO leaveApplications (staffId, reason, start_date, end_date) VALUES (?, ?, ?, ?)`,
     [req.user.id, reason, start_date, end_date]
   );
-  res.json({ message: "Leave submitted" });
+  res.json({ message: "Leave submitted", leave: req.body });
 });
 
 // View leave response
@@ -183,6 +183,29 @@ router.post(
     }
   }
 );
+
+// submit TLM (updated)
+router.post("/staff/submitTALMs", verifyToken, isStaff, async (req, res) => {
+  const { week, topic, notes } = req.body;
+  const staffId = req.user.id;
+  if (!week || !topic) {
+    return res.status(400).json({ message: "Week and topic are required" });
+  }
+  try {
+    await db.run(
+      `
+      INSERT INTO talms (staff_id, week, topic, notes)
+      VALUES (?, ?, ?, ?)
+    `,
+      [staffId, week, topic, notes]
+    );
+
+    res.status(201).json({ message: "TALM submitted successfully" });
+  } catch (error) {
+    console.error("Error saving TALM:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
 
 // ==============================
 //         ADMIN ROUTES
@@ -349,17 +372,14 @@ router.put(
 
 // Reject leave application
 router.put(
-  "/admin/LeaveApplication/reject",
+  "/admin/LeaveApplication/reject/:id",
   verifyToken,
   isAdmin,
   async (req, res) => {
-    const { email } = req.body;
-    const staff = await db.get(`SELECT id FROM staff WHERE email = ?`, [email]);
-    if (!staff) return res.status(404).json({ message: "Staff not found" });
-    await db.run(
-      `UPDATE leaveApplications SET status='rejected' WHERE staffId=?`,
-      [staff.id]
-    );
+    const id = req.params.id;
+    await db.run(`UPDATE leaveApplications SET status='rejected' WHERE id=?`, [
+      id,
+    ]);
     res.json({ message: "Leave rejected" });
   }
 );
@@ -398,10 +418,16 @@ router.get("/admin/viewTLMs", verifyToken, isAdmin, async (req, res) => {
   }
 });
 
+// view all tlms (updated version)
+router.get("/admin/viewTALMs", verifyToken, isAdmin, async (req, res) => {
+  const talms = await db.all(`SELECT * FROM talms`);
+  res.json(talms);
+});
+
 // view all suggestions
 router.get("/admin/viewSuggestions", verifyToken, isAdmin, async (req, res) => {
   try {
-    const suggestionboxItems = await db.get(
+    const suggestionboxItems = await db.all(
       `SELECT suggestion_box, suggestion_time From suggestions`
     );
     if (!suggestionboxItems) {
@@ -450,6 +476,32 @@ router.delete("/admin/delete", verifyToken, isAdmin, async (req, res) => {
   await db.run(`DELETE FROM leaveApplications WHERE staffId = ?`, [staff.id]);
   await db.run(`DELETE FROM tlm WHERE staffId = ?`, [staff.id]);
   res.json({ message: "Staff and related data deleted" });
+});
+
+// get number of all suggestion box items , leave applications and staff
+router.get("/admin/stats", verifyToken, isAdmin, async (req, res) => {
+  try {
+    const leaveCount = await db.get(
+      `SELECT COUNT(*) as totalLeaves FROM leaveApplications`
+    );
+
+    const staffCount = await db.get(
+      `SELECT COUNT(*) as totalStaff FROM staff WHERE role = 'staff'`
+    );
+
+    const suggestionCount = await db.get(
+      `SELECT COUNT(*) as totalSuggestions FROM suggestions`
+    );
+
+    res.json({
+      totalLeaves: leaveCount.totalLeaves,
+      totalSuggestions: suggestionCount.totalSuggestions,
+      totalStaff: staffCount.totalStaff,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "could not retrieve stats" });
+  }
 });
 
 export default router;

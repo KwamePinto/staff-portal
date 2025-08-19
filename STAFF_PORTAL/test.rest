@@ -7,9 +7,9 @@ Content-Type: application/json
 
 
 {
-     "email": "Testuser@gmail.com",
+     "email": "Testuser1@gmail.com",
     "name": "Testuser",
-    "password": "123456"
+    "password": "1234567890"
 
 
 
@@ -36,8 +36,8 @@ POST http://localhost:3000/api/staff/login
 Content-Type: application/json
 
 {
-    "email": "vkpinto1234@gmail.com",
-    "password": "123456"
+    "email": "Testuser1@gmail.com",
+    "password": "1234567890"
 
 
 }
@@ -153,7 +153,7 @@ Authorization: Bearer
 
 
 ### admin get all staff profiles
-GET http://localhost:3000/users/admin/staffProfiles
+GET http://localhost:3000/users/admin/staffProfiles/1
 Authorization: Bearer 
 
 ### admin get all staff leaveApplications
@@ -200,7 +200,7 @@ Content-Type: application/json
 }
 
 ### admin view suggestions
-GET http://localhost:3000/users/admin/viewSuggestions
+GET http://localhost:3000/users/admin/viewSuggestions/
 Authorization: Bearer 
 
 

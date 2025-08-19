@@ -23,6 +23,7 @@ await db.exec(`
     contact TEXT,
     address TEXT
   );`);
+
 await db.exec(`
   CREATE TABLE IF NOT EXISTS leaveApplications (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -42,7 +43,19 @@ await db.exec(`
   FOREIGN KEY (staff_id) REFERENCES staff(id) ON DELETE CASCADE
   );`);
 
-export default db;
+await db.exec(
+  `
+  CREATE TABLE IF NOT EXISTS talms (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  staff_id INTEGER NOT NULL,
+  week TEXT NOT NULL,
+  topic TEXT NOT NULL,
+  notes TEXT,
+  created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (staff_id) REFERENCES staff(id) ON DELETE CASCADE
+  )
+  `
+);
 
 await db.exec(`
   CREATE TABLE IF NOT EXISTS announcements (
@@ -62,3 +75,5 @@ await db.exec(`
   )
   
   `);
+
+export default db;

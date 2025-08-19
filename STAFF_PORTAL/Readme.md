@@ -109,6 +109,22 @@ Content-Type: application/pdf
 ../sample.pdf
 --MyBoundary--
 
+
+staff can also submit TLMs through;
+POST http://localhost:3000/users/staff/submitTALMs
+
+this is an example of the accepted payload
+{
+"week": "1",
+"topic": "basics of sample subject",
+"notes": "this is a sample lesson note for week 1"
+}
+
+admin can view TALMs through;
+GET http://localhost:3000/users/admin/viewTALMs
+
+
+
 admin can be signed up to the system through;
 http://localhost:3000/api/admin/signup
 
@@ -131,6 +147,10 @@ this is an example of the accepted payload
 
 admins can get all staff profiles through
 GET http://localhost:3000/users/admin/staffProfiles
+
+admins can get all staff profiles by id through
+GET http://localhost:3000/users/admin/staffProfiles/id
+
 
 admin can get all staff submitted leaveApplications through
 http://localhost:3000/users/admin/leaveApplications
@@ -171,7 +191,10 @@ this is an example of the accepted payload
 }
 
 admin can view suggestions through;
-GET http://localhost:3000/users/admin/viewTLMs
+GET http://localhost:3000/users/admin/suggestions
+
+admin can view suggestions by id through;
+GET http://localhost:3000/users/admin/suggestions/:id (where id = 1, 2, 3, ...)
 
 admin can delete user accounts through
 DELETE http://localhost:3000/users/admin/delete
@@ -181,6 +204,10 @@ this is an example of the accepted payload
 {
 "email": "example@gmail.com"
 }
+
+admin can get admin stats through;
+GET http://localhost:3000/users/admin/stats
+(this will return the total number of staff, total number of leave applications, total number of TLMs submitted, and total number of suggestions made by staff)
 
       *************************************************************************************************************************************************
 
