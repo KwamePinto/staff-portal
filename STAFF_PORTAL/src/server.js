@@ -16,6 +16,7 @@ app.use(express.json());
 app.use("/api", authRoutes);
 app.use("/users", userRoutes);
 app.use(express.static(path.join(__dirname, "../public")));
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "../public", "index.html"));

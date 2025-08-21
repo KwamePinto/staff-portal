@@ -57,6 +57,24 @@ await db.exec(
   `
 );
 
+// TLMS table creation (original)
+await db.exec(`
+  CREATE TABLE IF NOT EXISTS tlm (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  staff_id INTEGER ,
+  title TEXT ,
+  description TEXT ,
+  file_path TEXT ,
+  original_name TEXT ,
+  submitted_at TEXT DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (staff_id) REFERENCES staff(id) ON DELETE CASCADE
+  )
+
+  
+  
+  
+  `);
+
 await db.exec(`
   CREATE TABLE IF NOT EXISTS announcements (
   id INTEGER PRIMARY KEY AUTOINCREMENT,

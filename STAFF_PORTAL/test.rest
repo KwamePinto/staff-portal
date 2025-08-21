@@ -18,11 +18,11 @@ Content-Type: application/json
 ### admin sign up a staff
 POST  http://localhost:3000/users/admin/addStaff
 Content-Type: application/json
-Authorization: Bearer 
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzU1Nzc1Nzc2fQ.bqGIjMcrE8eyGaxoWsfLD7ae3060IjGnNMnSkuxU4PA
 
 {
-    "email": "emmanuelofotsukwablaagbovie@gmail.com",
-    "name": "Emmanuel",
+    "email": "efuamichelle18@gmail.com",
+    "name": "Michelle Efua Adams",
     "role": "staff"
 
 
@@ -73,9 +73,9 @@ Authorization: Bearer
 ### staff submit leave
 POST http://localhost:3000/users/staff/leave
 Content-Type: application/json
-Authorization: Bearer 
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6InN0YWZmIiwiaWF0IjoxNzU1NjQzMDg5fQ.lVTGbYSs8bHI2vKDGWQUUKn2nvu3NWedTVqRT8LpCoE
 
-{"reason": "study room leave",
+{"reason": "work emergency",
   "start_date": "2025-06-11",
   "end_date": "2025-06-1"
   
@@ -87,30 +87,33 @@ Authorization: Bearer
 
 ### staff submit suggestions
 POST http://localhost:3000/users/staff/suggestions
-Authorization: Bearer 
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6InN0YWZmIiwiaWF0IjoxNzU1NjQzMDg5fQ.lVTGbYSs8bHI2vKDGWQUUKn2nvu3NWedTVqRT8LpCoE
 Content-Type: application/json
 
 {
-  "suggestion": "improve the school infrastructure"
-  
+  "suggestion": "improve the library resources "
+
 }
 
 ### staff view leave application responce
 GET http://localhost:3000/users/staff/leaveResponce
-Authorization: Bearer 
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6InN0YWZmIiwiaWF0IjoxNzU1NTQyNTI2fQ.XyiySzMq9ICBsi1v6ghKqqmnTssj-CzlOfMTjer_YhQ
+
 ### staff submits TLMs
 POST http://localhost:3000/users/staff/submitTLMs
-Authorization: Bearer 
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6InN0YWZmIiwiaWF0IjoxNzU1NzkyNzc5fQ.ihBlq4DbuDnqsddH97E33pZeQIC2QMKOXlhdyWr8Fm4
 Content-Type: multipart/form-data; boundary=MyBoundary
 
 --MyBoundary
 Content-Disposition: form-data; name="title"
-
 Introduction to sample subject
 
 --MyBoundary
-Content-Disposition: form-data; name="description"
+Content-Disposition: form-data; name="original_name"
+sample subject TLM
 
+--MyBoundary
+Content-Disposition: form-data; name="description"
 Week 1 lesson note covering basics of sample subject
 --MyBoundary
 Content-Disposition: form-data; name="file"; filename="sample.pdf"
@@ -118,6 +121,19 @@ Content-Type: application/pdf
 
  ../sample.pdf
 --MyBoundary--
+
+
+### staff submits TLMs (updated version)
+POST http://localhost:3000/users/staff/submitTALMs
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6InN0YWZmIiwiaWF0IjoxNzU1NjQzMDg5fQ.lVTGbYSs8bHI2vKDGWQUUKn2nvu3NWedTVqRT8LpCoE
+
+{
+  "week": "1",
+  "topic": " basics of sample subject",
+  "notes": "this is a sample lesson note for week 1"
+}
+
 
 
 
@@ -158,7 +174,7 @@ Authorization: Bearer
 
 ### admin get all staff leaveApplications
 GET http://localhost:3000/users/admin/leaveApplications
-Authorization: Bearer 
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzU1NjQzMzAwfQ.jCqoznx3wLlP9HLqNEx2CMBdOarFnogUvZNiFKhZEhM
 
 ### admin get staff leaveApplications by ID
 GET http://localhost:3000/users/admin/leaveApplications/2
@@ -176,17 +192,17 @@ Content-Type: application/json
 }
 
 ### admin reject leave application
-PUT http://localhost:3000/users/admin/LeaveApplication/reject
-Authorization: Bearer 
-Content-Type: application/json
+PUT http://localhost:3000/users/admin/LeaveApplication/reject/3
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzU1NTQyNzg0fQ.3zT_Bqa_Wm2xPlnAcGOmmVbHoVm36jqnv56IU6KFrYY
 
-{
- "email": "EmmaAgbovie@gmail.com"
-}
+
 
 ### admin views all staff submitted TLMs
 GET http://localhost:3000/users/admin/viewTLMs
-Authorization : Bearer 
+Authorization : Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzU1NzkyODUzfQ.watG8zLzEBEQZnknz00FqFpVMUasqpp56fdwIVe6Ixc
+### admin views all staff submitted TLMs (updated version)
+GET http://localhost:3000/users/admin/viewTALMs
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzU1NjQzMzAwfQ.jCqoznx3wLlP9HLqNEx2CMBdOarFnogUvZNiFKhZEhM
 
 ### admin broadcasts announcements
 POST http://localhost:3000/users/admin/announcement
@@ -201,8 +217,11 @@ Content-Type: application/json
 
 ### admin view suggestions
 GET http://localhost:3000/users/admin/viewSuggestions/
-Authorization: Bearer 
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzU1NTQyNzg0fQ.3zT_Bqa_Wm2xPlnAcGOmmVbHoVm36jqnv56IU6KFrYY
 
+### get admin stats
+GET http://localhost:3000/users/admin/stats
+Authorization : Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzU1NjQzMzAwfQ.jCqoznx3wLlP9HLqNEx2CMBdOarFnogUvZNiFKhZEhM
 
 
 

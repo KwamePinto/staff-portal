@@ -21,7 +21,7 @@ const router = express.Router();
 // Configure multer for file storage
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/TLM/"); // Ensure this folder exists
+    cb(null, "uploads/TLM/");
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
@@ -158,7 +158,7 @@ router.post(
   isStaff,
   upload.single("file"),
   async (req, res) => {
-    const { title, description } = req.body;
+    const { title, description, original_name } = req.body;
     const staffId = req.user.id;
 
     if (!req.file) {
@@ -170,10 +170,10 @@ router.post(
     try {
       await db.run(
         `
-        INSERT INTO tlm (staff_id, title, description, file_path)
-        VALUES (?, ?, ?, ?)
+        INSERT INTO tlm (staff_id, title, description, original_name, file_path)
+        VALUES (?, ?, ?, ?, ?)
       `,
-        [staffId, title, description, filePath]
+        [staffId, title, description, original_name, filePath]
       );
 
       res.status(201).json({ message: "Teaching note uploaded successfully" });
@@ -291,6 +291,32 @@ router.get("/admin/profile", verifyToken, isAdmin, async (req, res) => {
   res.json(Admin);
 });
 
+// Update admin profile
+router.put("/Admin/profile", verifyToken, isAdmin, async (req, res) => {
+  const { name, email, password, classTaught, subject, contact, address } =
+    req.body;
+  const current = await db.get(`SELECT password FROM staff WHERE id = ?`, [
+    req.user.id,
+  ]);
+  const hashedPassword = password
+    ? await bcrypt.hash(password, 10)
+    : current.password;
+  await db.run(
+    `UPDATE staff SET name=?, email=?, password=?, classTaught=?, subject=?, contact=?, address=? WHERE id=?`,
+    [
+      name,
+      email,
+      hashedPassword,
+      classTaught,
+      subject,
+      contact,
+      address,
+      req.user.id,
+    ]
+  );
+  res.json({ message: "Profile updated" });
+});
+
 // View all staff profiles
 router.get("/admin/staffProfiles", verifyToken, isAdmin, async (req, res) => {
   const profiles = await db.all(
@@ -355,18 +381,15 @@ router.get(
 
 // Approve leave application
 router.put(
-  "/admin/LeaveApplication/approve",
+  "/admin/LeaveApplication/approve/:id",
   verifyToken,
   isAdmin,
   async (req, res) => {
-    const { email } = req.body;
-    const staff = await db.get(`SELECT id FROM staff WHERE email = ?`, [email]);
-    if (!staff) return res.status(404).json({ message: "Staff not found" });
-    await db.run(
-      `UPDATE leaveApplications SET status='approved' WHERE staffId=?`,
-      [staff.id]
-    );
-    res.json({ message: "Leave approved" });
+    const id = req.params.id;
+    await db.run(`UPDATE leaveApplications SET status='approved' WHERE id=?`, [
+      id,
+    ]);
+    res.json({ message: "Leave approved successfully" });
   }
 );
 
@@ -384,14 +407,8 @@ router.put(
   }
 );
 
-// admin view all TLM submissions
+// Admin view TLMs
 router.get("/admin/viewTLMs", verifyToken, isAdmin, async (req, res) => {
-  if (req.user.role !== "admin") {
-    return res.status(403).json({ message: "Forbidden: Admins only" });
-  }
-
-  const db = await initDb();
-
   try {
     const materials = await db.all(`
       SELECT 
@@ -399,6 +416,7 @@ router.get("/admin/viewTLMs", verifyToken, isAdmin, async (req, res) => {
         tlm.title,
         tlm.description,
         tlm.file_path,
+        tlm.original_name,
         tlm.submitted_at,
         staff.name AS staff_name,
         staff.email AS staff_email
@@ -411,10 +429,26 @@ router.get("/admin/viewTLMs", verifyToken, isAdmin, async (req, res) => {
       return res.status(404).json({ message: "No teaching materials found" });
     }
 
-    res.status(200).json(materials);
+    // Build file URLs so admin can access the files
+    const baseUrl = `${req.protocol}://${req.get("host")}`;
+    const formatted = materials.map((m) => ({
+      id: m.id,
+      title: m.title,
+      description: m.description,
+      staff_name: m.staff_name,
+      staff_email: m.staff_email,
+      submitted_at: m.submitted_at,
+      original_name: m.original_name, // what the staff originally uploaded
+      file_url: `${baseUrl}/${m.file_path.replace(/\\/g, "/")}`, // downloadable link
+    }));
+
+    res.status(200).json(formatted);
   } catch (error) {
     console.error("Failed to fetch TLMs", error);
-    res.status(500).json({ message: "Failed to retrieve teaching materials" });
+    res.status(500).json({
+      message: "Failed to retrieve teaching materials",
+      error: error.message,
+    });
   }
 });
 
